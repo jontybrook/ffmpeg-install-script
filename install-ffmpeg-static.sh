@@ -11,13 +11,6 @@ echo "************************************************"
 echo "************************************************"
 echo "Starting ffmpeg static install script..."
 
-# If --stable is passed as an argument, install the latest release build of ffmpeg
-# otherwise install the latest static 'git master' build of ffmpeg
-buildVersion="git" # default to git master build
-if [[ $1 == "--stable" ]]; then
-    buildVersion="release"
-    echo "Installing the latest stable build of ffmpeg"
-fi
 
 # Check that md5sum and wget are installed
 echo "Checking that md5sum and wget are installed"
@@ -71,26 +64,40 @@ case $arch in
         ;;
 esac
 
+# If --stable is passed as an argument, install the latest release build of ffmpeg
+# otherwise install the latest static 'git master' build of ffmpeg
+buildVersion="git"
+buildDownloadUrlPrefix="https://johnvansickle.com/ffmpeg/builds"
+if [[ $1 == "--stable" ]] || [[ $2 == "--stable" ]]; then
+    buildVersion="release"
+    buildDownloadUrlPrefix="https://johnvansickle.com/ffmpeg/releases"
+    echo "Installing the latest stable build of ffmpeg"
+fi
+
 # Download the latest static nightly build of ffmpeg
-echo "Downloading the latest static nightly build of ffmpeg"
-wget https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-$architecture-static.tar.xz
+echo "Downloading the latest $buildVersion build of ffmpeg"
+wget "$buildDownloadUrlPrefix/ffmpeg-$buildVersion-$architecture-static.tar.xz"
 
 # Download the md5 checksum file
 echo "Downloading the md5 checksum file..."
-wget https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-$architecture-static.tar.xz.md5
+wget "$buildDownloadUrlPrefix/ffmpeg-$buildVersion-$architecture-static.tar.xz.md5"
 
 # Verify the checksum
 echo "Verifying the checksum of the downloaded file.."
-md5sum -c ffmpeg-git-$architecture-static.tar.xz.md5
+if ! md5sum -c ffmpeg-$buildVersion-$architecture-static.tar.xz.md5; then
+    echo "MD5 checksum verification failed. The downloaded file may be corrupted."
+    echo "The script will now exit."
+    exit 1
+fi
 
 # Unpack the build
 echo "Unpacking the build.."
-tar xvf ffmpeg-git-$architecture-static.tar.xz
+tar xvf ffmpeg-$buildVersion-$architecture-static.tar.xz
 
 # Find the directory name of the unpacked build (it changes with each nightly build) and cd into it. 
 # The format is ffmpeg-git-YYYYMMDD-amd64-static
 echo "Navigating to the unpacked build directory"
-cd ffmpeg-git-*/
+cd ffmpeg-*-*/
 
 # Cat out the readme so we can log it during builds that use this script
 echo "Displaying the contents of readme.txt"

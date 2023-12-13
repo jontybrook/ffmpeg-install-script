@@ -4,6 +4,8 @@
 
 This script installs the latest static build of FFmpeg (including ffprobe) on Ubuntu systems. 'Static' means that all libraries are compiled into the binary files, so no additional libraries are required. This makes it easy to install and use FFmpeg on any Ubuntu system.
 
+> The script installs FFmpeg from [John Van Sickle's FFmpeg Builds](https://johnvansickle.com/ffmpeg/) - Special thanks to John for providing these builds. If you find this useful, please consider [donating to John](https://johnvansickle.com/ffmpeg/) to support his work.
+
 ### Quick Start
 
 These one-liners will download and run the script, installing the latest static build of FFmpeg on your system. Note that any existing FFmpeg installations will be removed (omit the '--force' option to be prompted before removing existing installations).
@@ -21,14 +23,12 @@ wget -O - https://raw.githubusercontent.com/jontybrook/ffmpeg-install-script/mai
 Install the latest 'stable' (release) FFmpeg build:
 
 ```bash
-wget -O - https://raw.githubusercontent.com/jontybrook/ffmpeg-install-script/main/install-ffmpeg-static.sh | bash -s -- --release --force
+wget -O - https://raw.githubusercontent.com/jontybrook/ffmpeg-install-script/main/install-ffmpeg-static.sh | bash -s -- --stable --force
 ```
 
 ## Overview
 
 This script automates the installation of the latest static nightly build of FFmpeg on Ubuntu systems. Specifically designed for Ubuntu versions 16.04 and above on amd64 architecture, it should also work with other Linux distributions.
-
-> The script installs FFmpeg from [John Van Sickle's FFmpeg Builds](https://johnvansickle.com/ffmpeg/) - Special thanks to John for providing these builds.
 
 _DISCLAIMER - Be careful when running scripts downloaded from the internet. Always review them before executing them on your system._
 
