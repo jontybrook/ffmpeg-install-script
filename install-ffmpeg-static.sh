@@ -24,6 +24,9 @@ fi
 echo "Deleting /tmp/ffmpeg-install directory if it exists"
 rm -rf /tmp/ffmpeg-install
 
+# Remember pwd so we can cd back to it later
+previousWorkingDirectory=$(pwd)
+
 # create and cd into /tmp/ffmpeg-install
 echo "Creating and navigating to /tmp/ffmpeg-install directory"
 mkdir -p /tmp/ffmpeg-install
@@ -60,6 +63,7 @@ case $arch in
         echo "The script will now exit"
         echo "!!!!!!!!!!!!"
         echo "FFMPEG INSTALL FAILED: Unknown architecture: $arch" >&2
+        cd $previousWorkingDirectory # cd back to the previous working directory
         exit 1
         ;;
 esac
@@ -87,6 +91,7 @@ echo "Verifying the checksum of the downloaded file.."
 if ! md5sum -c ffmpeg-$buildVersion-$architecture-static.tar.xz.md5; then
     echo "MD5 checksum verification failed. The downloaded file may be corrupted."
     echo "The script will now exit."
+    cd $previousWorkingDirectory # cd back to the previous working directory
     exit 1
 fi
 
@@ -157,6 +162,8 @@ else
     echo "FFMPEG INSTALL FAILED: ffmpeg is not installed" >&2
     exit 1
 fi
+
+cd $previousWorkingDirectory # cd back to the previous working directory
 
 echo "Cleaning up /tmp/ffmpeg-install directory"
 rm -rf /tmp/ffmpeg-install
