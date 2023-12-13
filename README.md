@@ -4,6 +4,8 @@
 
 This script installs the latest static build of FFmpeg (including ffprobe) on Ubuntu systems. 'Static' means that all libraries are compiled into the binary files, so no additional libraries are required. This makes it easy to install and use FFmpeg on any Ubuntu system.
 
+This script essentially automates the steps described [here](https://johnvansickle.com/ffmpeg/faq) for installing FFmpeg on Ubuntu.
+
 > The script installs FFmpeg from [John Van Sickle's FFmpeg Builds](https://johnvansickle.com/ffmpeg/) - Special thanks to John for providing these builds. If you find this useful, please consider [donating to John](https://johnvansickle.com/ffmpeg/) to support his work.
 
 ### Quick Start
@@ -28,22 +30,22 @@ wget -O - https://raw.githubusercontent.com/jontybrook/ffmpeg-install-script/mai
 
 ## Overview
 
-This script automates the installation of the latest static nightly build of FFmpeg on Ubuntu systems. Specifically designed for Ubuntu versions 16.04 and above on amd64 architecture, it should also work with other Linux distributions.
+This script automates the installation of FFmpeg static builds on Ubuntu systems. Designed for Ubuntu, but it should also work with other Linux distributions.
 
 _DISCLAIMER - Be careful when running scripts downloaded from the internet. Always review them before executing them on your system._
 
 ## Features
 
 - Automatically installs the latest FFmpeg static build.
-- Supports multiple architectures: amd64, i686, armhf, and arm64.
+- Automatically detects supported system architectures: amd64, i686, armhf, and arm64.
 - Checks and removes existing FFmpeg installations if needed.
 - Copies ffmpeg and ffprobe binaries to `/usr/local/bin`.
-- Vverifies downloaded files using md5 checksums.
+- Verifies downloaded files using md5 checksum.
 - Tested on Ubuntu 18.04, 20.04, 22.04
 
 ### Motivation
 
-The ffmpeg builds provided in Ubuntu's apt repository are old and out of date. This script was written to install ffmpeg in Docker container builds, but is perfectly suitable for use on any Ubuntu system.
+The ffmpeg builds provided in Ubuntu's apt repository are old and out of date. This script was written to install ffmpeg in Docker container builds, but is suitable for use on any Ubuntu system.
 
 ## Prerequisites
 
