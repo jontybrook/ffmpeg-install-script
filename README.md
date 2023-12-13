@@ -13,7 +13,7 @@ These one-liners will download and run the script, installing the latest static 
 Install the latest 'master' FFmpeg build (from the [FFmpeg git master branch](https://github.com/FFmpeg/FFmpeg)):
 
 ```bash
-wget -O - https://raw.githubusercontent.com/jontbrook/ffmpeg-install-script/master/install-ffmpeg-static.sh | bash -s -- --force
+wget -O - https://raw.githubusercontent.com/jontybrook/ffmpeg-install-script/main/install-ffmpeg-static.sh | bash -s -- --force
 ```
 
 #### One-line Install - (Release Build)
@@ -21,7 +21,7 @@ wget -O - https://raw.githubusercontent.com/jontbrook/ffmpeg-install-script/mast
 Install the latest 'stable' (release) FFmpeg build:
 
 ```bash
-wget -O - https://raw.githubusercontent.com/jontbrook/ffmpeg-install-script/master/install-ffmpeg-static.sh | bash -s -- --release --force
+wget -O - https://raw.githubusercontent.com/jontybrook/ffmpeg-install-script/main/install-ffmpeg-static.sh | bash -s -- --release --force
 ```
 
 ## Overview

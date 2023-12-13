@@ -13,15 +13,19 @@ echo "Starting ffmpeg static install script..."
 
 # If --stable is passed as an argument, install the latest release build of ffmpeg
 # otherwise install the latest static 'git master' build of ffmpeg
-$buildVersion = "git" # default to git master build
+buildVersion="git" # default to git master build
 if [[ $1 == "--stable" ]]; then
-    $buildVersion = "release"
+    buildVersion="release"
     echo "Installing the latest stable build of ffmpeg"
 fi
 
-# Install dependencies needed to run this script
-echo "Installing wget and md5sum (needed to run this script)"
-sudo apt-get install wget md5sum
+# Check that md5sum and wget are installed
+echo "Checking that md5sum and wget are installed"
+if ! hash md5sum 2>/dev/null; then
+    echo "md5sum is not installed. Please install it using 'sudo apt-get install md5sum'"
+    echo "The script will now exit"
+    exit 1
+fi
 
 # Delete the /tmp/ffmpeg-install directory if it exists
 echo "Deleting /tmp/ffmpeg-install directory if it exists"
@@ -38,22 +42,23 @@ echo "Finding the architecture of the system"
 arch=$(uname -m)
 
 # Map the uname output to your required format
-$architecture = ""
+architecture=""
 case $arch in
     x86_64)
         echo "Detected amd64 architecture. The appropriate ffmpeg build will be downloaded"
-        $architecture = "amd64"
+        architecture="amd64"
         ;;
     i686 | i386)
         echo "Detected i686 architecture. The appropriate ffmpeg build will be downloaded"
-        $architecture = "i686"
+        architecture="i686"
         ;;
     armv6l | armv7l)
         echo "Detected armhf architecture. The appropriate ffmpeg build will be downloaded"
-        $architecture = "armhf"
+        architecture="armhf"
         ;;
     aarch64)
         echo "Detected arm64 architecture. The appropriate ffmpeg build will be downloaded"
+        architecture="arm64"
         ;;
     *)
         echo "!!!!!!!!!!!!"
@@ -76,11 +81,11 @@ wget https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-$architecture-static.tar
 
 # Verify the checksum
 echo "Verifying the checksum of the downloaded file.."
-md5sum -c ffmpeg-git-amd64-static.tar.xz.md5
+md5sum -c ffmpeg-git-$architecture-static.tar.xz.md5
 
 # Unpack the build
 echo "Unpacking the build.."
-tar xvf ffmpeg-git-amd64-static.tar.xz
+tar xvf ffmpeg-git-$architecture-static.tar.xz
 
 # Find the directory name of the unpacked build (it changes with each nightly build) and cd into it. 
 # The format is ffmpeg-git-YYYYMMDD-amd64-static
@@ -134,10 +139,29 @@ fi
 echo "Copying ffmpeg and ffprobe binaries to /usr/local/bin"
 sudo cp ffmpeg ffprobe /usr/local/bin
 
+# Check if the ffmpeg and ffprobe binaries copied successfully
+if hash ffmpeg 2>/dev/null; then
+    echo "ffmpeg is now installed at $(which ffmpeg)"
+else
+    echo "!!!!!!!!!!!!"
+    echo "FFMPEG INSTALL FAILED: ffmpeg is not installed"
+    echo "The script will now exit"
+    echo "!!!!!!!!!!!!"
+    echo "FFMPEG INSTALL FAILED: ffmpeg is not installed" >&2
+    exit 1
+fi
+
+echo "Cleaning up /tmp/ffmpeg-install directory"
+rm -rf /tmp/ffmpeg-install
+
 # Check the version of ffmpeg
-echo "Checking the version of ffmpeg"
+echo "************************************************"
+echo "** ffmpeg installation complete"
+echo "** You should see the version of ffmpeg installed printed out below (ffmpeg -version)"
+echo "************************************************"
+
 ffmpeg -version
 
 echo "************************************************"
-echo "** Finished installing ffmpeg static build to /usr/local/bin"
+echo "** ffmpeg static install script finished"
 echo "************************************************"
