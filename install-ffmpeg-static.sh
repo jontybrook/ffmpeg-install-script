@@ -11,6 +11,17 @@ echo "************************************************"
 echo "************************************************"
 echo "Starting ffmpeg static install script..."
 
+# Check if sudo is required so we can adapt the script accordingly. 
+# In docker build contexts, sudo is usually not required nor installed. To support this use case,
+# if sudo is not installed, the script will run the commands without sudo.
+echo "Checking if sudo is required"
+if hash sudo 2>/dev/null; then
+    echo "sudo is installed. The script will use sudo where required."
+    sudo_required=true
+else
+    echo "sudo is not installed. The script will run commands without sudo."
+    sudo_required=false
+fi
 
 # Check that md5sum and wget are installed
 echo "Checking that md5sum and wget are installed"
@@ -80,11 +91,19 @@ fi
 
 # Download the latest static nightly build of ffmpeg
 echo "Downloading the latest $buildVersion build of ffmpeg"
-wget "$buildDownloadUrlPrefix/ffmpeg-$buildVersion-$architecture-static.tar.xz"
+if $sudo_required; then
+    sudo wget "$buildDownloadUrlPrefix/ffmpeg-$buildVersion-$architecture-static.tar.xz"
+else
+    wget "$buildDownloadUrlPrefix/ffmpeg-$buildVersion-$architecture-static.tar.xz"
+fi
 
 # Download the md5 checksum file
 echo "Downloading the md5 checksum file..."
-wget "$buildDownloadUrlPrefix/ffmpeg-$buildVersion-$architecture-static.tar.xz.md5"
+if $sudo_required; then
+    sudo wget "$buildDownloadUrlPrefix/ffmpeg-$buildVersion-$architecture-static.tar.xz.md5"
+else
+    wget "$buildDownloadUrlPrefix/ffmpeg-$buildVersion-$architecture-static.tar.xz.md5"
+fi
 
 # Verify the checksum
 echo "Verifying the checksum of the downloaded file.."
@@ -114,19 +133,31 @@ cat readme.txt
 
 # Install nscd 
 echo "Installing nscd"
-sudo apt-get install nscd
+if $sudo_required; then
+    sudo apt-get install nscd
+else
+    apt-get install nscd
+fi
 
 # Check if FFmpeg is installed using apt
 if dpkg -s ffmpeg &>/dev/null; then
     echo "FFmpeg is already installed using apt"
     if [[ $1 == "--force" ]]; then
         echo "Removing ffmpeg..."
-        sudo apt-get remove ffmpeg
+        if $sudo_required; then
+            sudo apt-get remove ffmpeg
+        else
+            apt-get remove ffmpeg
+        fi
     else
         read -p "Do you want to remove it? (y/n): " answer
         if [[ $answer == "y" ]]; then
             echo "Removing ffmpeg..."
-            sudo apt-get remove ffmpeg
+            if $sudo_required; then
+                sudo apt-get remove ffmpeg
+            else
+                apt-get remove ffmpeg
+            fi
         fi
     fi
 fi
@@ -136,12 +167,20 @@ if hash ffmpeg 2>/dev/null; then
     echo "ffmpeg is already installed at $(which ffmpeg)"
     if [[ $1 == "--force" ]]; then
         echo "Removing ffmpeg..."
-        sudo rm $(which ffmpeg)
+        if $sudo_required; then
+            sudo rm $(which ffmpeg)
+        else
+            rm $(which ffmpeg)
+        fi
     else
         read -p "Do you want to remove it? (y/n): " answer
         if [[ $answer == "y" ]]; then
             echo "Removing ffmpeg..."
-            sudo rm $(which ffmpeg)
+            if $sudo_required; then
+                sudo rm $(which ffmpeg)
+            else
+                rm $(which ffmpeg)
+            fi
         fi
     fi
 fi
@@ -149,7 +188,11 @@ fi
 
 # Copy the ffmpeg and ffprobe binaries to /usr/local/bin
 echo "Copying ffmpeg and ffprobe binaries to /usr/local/bin"
-sudo cp ffmpeg ffprobe /usr/local/bin
+if $sudo_required; then
+    sudo cp ffmpeg ffprobe /usr/local/bin
+else
+    cp ffmpeg ffprobe /usr/local/bin
+fi
 
 # Check if the ffmpeg and ffprobe binaries copied successfully
 if hash ffmpeg 2>/dev/null; then
