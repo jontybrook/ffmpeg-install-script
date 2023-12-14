@@ -31,17 +31,18 @@ if ! hash md5sum 2>/dev/null; then
     exit 1
 fi
 
-# Delete the /tmp/ffmpeg-install directory if it exists
-echo "Deleting /tmp/ffmpeg-install directory if it exists"
-rm -rf /tmp/ffmpeg-install
+# Create a temporary directory
+temp_dir=$(mktemp -d)
+
+echo "Temporary directory is: $temp_dir"
 
 # Remember pwd so we can cd back to it later
 previousWorkingDirectory=$(pwd)
 
 # create and cd into /tmp/ffmpeg-install
 echo "Creating and navigating to /tmp/ffmpeg-install directory"
-mkdir -p /tmp/ffmpeg-install
-cd /tmp/ffmpeg-install
+mkdir -p $temp_dir/ffmpeg-install
+cd $temp_dir/ffmpeg-install
 
 # Find the architecture of the system
 echo "Finding the architecture of the system"
@@ -116,12 +117,12 @@ fi
 
 # Unpack the build
 echo "Unpacking the build.."
-tar xvf ffmpeg-$buildVersion-$architecture-static.tar.xz
+tar -xvf $temp_dir/ffmpeg-install/ffmpeg-$buildVersion-$architecture-static.tar.xz -C $temp_dir/ffmpeg-install/
 
 # Find the directory name of the unpacked build (it changes with each nightly build) and cd into it. 
 # The format is ffmpeg-git-YYYYMMDD-amd64-static
 echo "Navigating to the unpacked build directory"
-cd ffmpeg-*-*/
+cd $temp_dir/ffmpeg-install/ffmpeg-*-*/
 
 # Cat out the readme so we can log it during builds that use this script
 echo "Displaying the contents of readme.txt"
@@ -208,8 +209,8 @@ fi
 
 cd $previousWorkingDirectory # cd back to the previous working directory
 
-echo "Cleaning up /tmp/ffmpeg-install directory"
-rm -rf /tmp/ffmpeg-install
+echo "Cleaning up temproary directory $temp_dir"
+rm -rf $temp_dir
 
 # Check the version of ffmpeg
 echo "************************************************"
